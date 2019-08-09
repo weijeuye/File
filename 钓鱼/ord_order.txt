@@ -1,0 +1,270 @@
+-- Create table
+create table ORD_ORDER
+(
+  ORDER_ID                   NUMBER(20) not null,
+  ORI_ORDER_ID               NUMBER(11),
+  DISTRIBUTOR_ID             NUMBER(11),
+  DISTRIBUTOR_CODE           VARCHAR2(50),
+  ORDER_STATUS               VARCHAR2(20),
+  PAYMENT_STATUS             VARCHAR2(20),
+  RESOURCE_STATUS            VARCHAR2(20),
+  INFO_STATUS                VARCHAR2(20),
+  LAST_CANCEL_TIME           DATE,
+  WAIT_PAYMENT_TIME          DATE,
+  CANCEL_CODE                VARCHAR2(40),
+  REASON                     VARCHAR2(200),
+  CURRENCY_CODE              VARCHAR2(20),
+  OUGHT_AMOUNT               NUMBER(11) not null,
+  ACTUAL_AMOUNT              NUMBER(11) not null,
+  USER_ID                    VARCHAR2(50),
+  USER_NO                    NUMBER(11),
+  GUARANTEE                  VARCHAR2(20),
+  PAYMENT_TARGET             VARCHAR2(10) not null,
+  CREATE_TIME                DATE,
+  PAYMENT_TYPE               VARCHAR2(20),
+  VIEW_ORDER_STATUS          VARCHAR2(20),
+  INVOICE_STATUS             VARCHAR2(20),
+  REMARK                     VARCHAR2(500),
+  FILIALE_NAME               VARCHAR2(20),
+  PAYMENT_TIME               DATE,
+  BACK_USER_ID               VARCHAR2(50),
+  APPROVE_TIME               DATE,
+  VISIT_TIME                 DATE,
+  CANCEL_TIME                DATE,
+  BOOK_LIMIT_TYPE            VARCHAR2(20),
+  CLIENT_IP_ADDRESS          VARCHAR2(20),
+  CERT_CONFIRM_STATUS        VARCHAR2(30),
+  CANCEL_CERT_CONFIRM_STATUS VARCHAR2(30),
+  ORDER_MEMO                 VARCHAR2(2000),
+  REFUNDED_AMOUNT            NUMBER(11) default 0,
+  PROCESS_KEY                VARCHAR2(200),
+  DISTRIBUTION_CHANNEL       NUMBER(11),
+  DEPOSITS_AMOUNT            NUMBER(11),
+  NOTIFY_TYPE                VARCHAR2(20),
+  REBATE_AMOUNT              NUMBER,
+  REBATE_FLAG                VARCHAR2(1),
+  BONUS_AMOUNT               NUMBER,
+  NEED_INVOICE               VARCHAR2(20),
+  PROM_PAYMENT_CHANNEL       VARCHAR2(50),
+  CATEGORY_ID                NUMBER(11),
+  MANAGER_ID                 NUMBER(11),
+  BU_CODE                    VARCHAR2(30),
+  MOBILE_MORE_REBATE         NUMBER,
+  REMIND_SMS_SEND_STATUS     VARCHAR2(10) default 'NO_SEND',
+  ATTRIBUTION_ID             NUMBER,
+  ANONYMITY_BOOK_FLAG        VARCHAR2(10),
+  CANCEL_FAIL_COUNT          NUMBER default 0,
+  INVOKE_INTERFACE_PF_STATUS VARCHAR2(20),
+  SUPPLIER_API_FLAG          VARCHAR2(10),
+  RESOURCE_AMPLE_TIME        DATE,
+  INFO_PASS_TIME             DATE,
+  VALID_STATUS               VARCHAR2(10) default 'VALID',
+  COMPANY_TYPE               VARCHAR2(30),
+  LINE_ROUTE_ID              NUMBER,
+  START_DISTRICT_ID          NUMBER(11),
+  MOBILE_EQUIPMENT_NO        VARCHAR2(100),
+  IS_TEST_ORDER              CHAR(1) default 'N',
+  MANAGER_ID_PERM            VARCHAR2(500),
+  DISTRIBUTOR_NAME           VARCHAR2(60),
+  SUB_CATEGORY_ID            NUMBER(11),
+  ORDER_UPDATE_TIME          DATE,
+  SEND_CONTRACT_FLAG         VARCHAR2(32),
+  PAY_PROC_TRIGGERED         VARCHAR2(8) default 'N',
+  CANCEL_STRATEGY            VARCHAR2(30),
+  TAG                        NUMBER(11),
+  SMS_LVMAMA_FLAG            VARCHAR2(1) default 'Y',
+  UPDATE_TIME                DATE,
+  TRAVELLER_LOCK_FLAG        VARCHAR2(1),
+  TRAVELLER_DELAY_FLAG       VARCHAR2(1),
+  STAMPS_AMOUNT              NUMBER(11),
+  ORDER_SUBTYPE              VARCHAR2(100),
+  PRE_REFUND_STATUS          VARCHAR2(10),
+  PERFORM_STATUS             VARCHAR2(20),
+  END_TIME                   DATE,
+  APP_VERSION                VARCHAR2(32),
+  PAY_PROMOTION_AMOUNT       NUMBER(11),
+  TICKET_LAST_CONFIRM_TIME   DATE,
+  ORDER_CREATING_MANNER      VARCHAR2(1),
+  DISTRIBUTION_CPSID         VARCHAR2(128),
+  WORK_VERSION               VARCHAR2(20),
+  ORDER_DFP                  VARCHAR2(100),
+  CONTENT                    VARCHAR2(200),
+  BATCH_NO                   VARCHAR2(80) default '1000000' not null,
+  NEW_WORKFLOW_FLAG          CHAR(1) default 'N' not null,
+  GROUP_SETTLE_FLAG          CHAR(1),
+  PRE_PAY_FLAG               VARCHAR2(1)
+)
+tablespace LVMAMA_VER
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64
+    next 8
+    minextents 1
+    maxextents unlimited
+  );
+-- Add comments to the table 
+comment on table ORD_ORDER
+  is '订单';
+-- Add comments to the columns 
+comment on column ORD_ORDER.ORDER_ID
+  is '订单ID';
+comment on column ORD_ORDER.ORI_ORDER_ID
+  is '源订单ID';
+comment on column ORD_ORDER.DISTRIBUTOR_ID
+  is '分销渠道ID(原分销商ID）';
+comment on column ORD_ORDER.DISTRIBUTOR_CODE
+  is '渠道代码，(不参与运算，由分销自己提供，识别使用)';
+comment on column ORD_ORDER.ORDER_STATUS
+  is '订单状态';
+comment on column ORD_ORDER.PAYMENT_STATUS
+  is '支付状态（    UNPAY("待支付"), /** 待支付 **/
+    TRANSFERRED("已转移"),/**资金转移**/
+    PART_PAY("部分支付"), /** 部分支付 **/
+    PAYED("已支付 ");/** 已支付 **/）';
+comment on column ORD_ORDER.RESOURCE_STATUS
+  is '资源状态';
+comment on column ORD_ORDER.INFO_STATUS
+  is '信息状态';
+comment on column ORD_ORDER.LAST_CANCEL_TIME
+  is '最晚取消时间(无损取消时间)';
+comment on column ORD_ORDER.WAIT_PAYMENT_TIME
+  is '支付等待时间';
+comment on column ORD_ORDER.CANCEL_CODE
+  is '取消代码';
+comment on column ORD_ORDER.REASON
+  is '取消原因';
+comment on column ORD_ORDER.CURRENCY_CODE
+  is '货币代码';
+comment on column ORD_ORDER.OUGHT_AMOUNT
+  is '应付金额';
+comment on column ORD_ORDER.ACTUAL_AMOUNT
+  is '实付金额';
+comment on column ORD_ORDER.USER_ID
+  is '下单人';
+comment on column ORD_ORDER.USER_NO
+  is '下单人主键';
+comment on column ORD_ORDER.GUARANTEE
+  is '是否需要担保';
+comment on column ORD_ORDER.PAYMENT_TARGET
+  is '支付对象（支付给驴妈妈|供应商）';
+comment on column ORD_ORDER.CREATE_TIME
+  is '下单时间';
+comment on column ORD_ORDER.PAYMENT_TYPE
+  is '支付方式(必须预授|可预授权|普通支付)';
+comment on column ORD_ORDER.VIEW_ORDER_STATUS
+  is '订单展示状态';
+comment on column ORD_ORDER.INVOICE_STATUS
+  is '发票状态';
+comment on column ORD_ORDER.REMARK
+  is '游客备注';
+comment on column ORD_ORDER.FILIALE_NAME
+  is '所属公司';
+comment on column ORD_ORDER.PAYMENT_TIME
+  is '支付时间(最后一次支付操作时间)';
+comment on column ORD_ORDER.BACK_USER_ID
+  is '后台下单人ID';
+comment on column ORD_ORDER.APPROVE_TIME
+  is '审核时间';
+comment on column ORD_ORDER.VISIT_TIME
+  is '游玩入住日期';
+comment on column ORD_ORDER.CANCEL_TIME
+  is '订单 取消时间';
+comment on column ORD_ORDER.BOOK_LIMIT_TYPE
+  is '现付预订限制,同子项';
+comment on column ORD_ORDER.CLIENT_IP_ADDRESS
+  is '客人下单的IP地址，只针对前台有效';
+comment on column ORD_ORDER.CERT_CONFIRM_STATUS
+  is '凭证确认状态';
+comment on column ORD_ORDER.CANCEL_CERT_CONFIRM_STATUS
+  is '取消凭证确认状态';
+comment on column ORD_ORDER.ORDER_MEMO
+  is '后台备注';
+comment on column ORD_ORDER.REFUNDED_AMOUNT
+  is '退款金额';
+comment on column ORD_ORDER.DISTRIBUTION_CHANNEL
+  is '分销商ID';
+comment on column ORD_ORDER.DEPOSITS_AMOUNT
+  is '订金金额';
+comment on column ORD_ORDER.REBATE_AMOUNT
+  is '订单是否返现';
+comment on column ORD_ORDER.BONUS_AMOUNT
+  is '奖金抵扣金额';
+comment on column ORD_ORDER.NEED_INVOICE
+  is '可开发票';
+comment on column ORD_ORDER.PROM_PAYMENT_CHANNEL
+  is '促销支付渠道';
+comment on column ORD_ORDER.MOBILE_MORE_REBATE
+  is '手机端多返金额';
+comment on column ORD_ORDER.REMIND_SMS_SEND_STATUS
+  is '游玩前一天提醒短信的发送状态';
+comment on column ORD_ORDER.ANONYMITY_BOOK_FLAG
+  is '是否是匿名下单，Y：是; N：否';
+comment on column ORD_ORDER.INVOKE_INTERFACE_PF_STATUS
+  is '调用对接平台的状态，(INITIAL：初始化，CREATED：已调用创建供应商订单，PART_CREATED：部分子订单已调用创建供应商订单，CANCELED：已调用取消供应商订单，PART_CANCELED：部分子订单已调用取消供应商订单)';
+comment on column ORD_ORDER.SUPPLIER_API_FLAG
+  is '是否需要调用对接平台，(Y：需要，N：不需要)';
+comment on column ORD_ORDER.RESOURCE_AMPLE_TIME
+  is '资源审核时间';
+comment on column ORD_ORDER.INFO_PASS_TIME
+  is '信息审核时间';
+comment on column ORD_ORDER.VALID_STATUS
+  is '是否有效';
+comment on column ORD_ORDER.COMPANY_TYPE
+  is '公司主体';
+comment on column ORD_ORDER.LINE_ROUTE_ID
+  is '线路行程ID';
+comment on column ORD_ORDER.START_DISTRICT_ID
+  is '出发地ID';
+comment on column ORD_ORDER.MOBILE_EQUIPMENT_NO
+  is '手机设备号';
+comment on column ORD_ORDER.IS_TEST_ORDER
+  is '是否是测试单';
+comment on column ORD_ORDER.MANAGER_ID_PERM
+  is '订单权限';
+comment on column ORD_ORDER.DISTRIBUTOR_NAME
+  is '分销商名称';
+comment on column ORD_ORDER.SUB_CATEGORY_ID
+  is '子品类ID';
+comment on column ORD_ORDER.ORDER_UPDATE_TIME
+  is '更新时间';
+comment on column ORD_ORDER.SEND_CONTRACT_FLAG
+  is '发送合同标识';
+comment on column ORD_ORDER.PAY_PROC_TRIGGERED
+  is '是否触发支付流程';
+comment on column ORD_ORDER.CANCEL_STRATEGY
+  is '退改策略';
+comment on column ORD_ORDER.TAG
+  is '标识';
+comment on column ORD_ORDER.SMS_LVMAMA_FLAG
+  is '短信是否只认驴妈妈标识';
+comment on column ORD_ORDER.TRAVELLER_LOCK_FLAG
+  is 'Y锁定游玩人，N非锁定';
+comment on column ORD_ORDER.TRAVELLER_DELAY_FLAG
+  is 'Y游玩人后置';
+comment on column ORD_ORDER.ORDER_SUBTYPE
+  is '订单子类型';
+comment on column ORD_ORDER.PRE_REFUND_STATUS
+  is '门票订单提前退状态(APPLY:发起,COMPLETE:完成)';
+comment on column ORD_ORDER.END_TIME
+  is '结束时间/离店时间';
+comment on column ORD_ORDER.APP_VERSION
+  is 'App版本号';
+comment on column ORD_ORDER.PAY_PROMOTION_AMOUNT
+  is '银行立减金额';
+comment on column ORD_ORDER.TICKET_LAST_CONFIRM_TIME
+  is '门票订单最晚确认时间';
+comment on column ORD_ORDER.ORDER_CREATING_MANNER
+  is '下单方式，1 正常下单，2后台一键重下，3前台一键重下';
+comment on column ORD_ORDER.DISTRIBUTION_CPSID
+  is 'cpsid';
+comment on column ORD_ORDER.ORDER_DFP
+  is '设备指纹';
+comment on column ORD_ORDER.CONTENT
+  is '附加内容,json格式';
+comment on column ORD_ORDER.NEW_WORKFLOW_FLAG
+  is '订单新工作流标志(Y/N)';
+comment on column ORD_ORDER.GROUP_SETTLE_FLAG
+  is '是否团结算';

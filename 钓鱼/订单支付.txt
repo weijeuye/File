@@ -1,0 +1,7 @@
+﻿pay_logs 支付日志表
+订单支付要做到5w+1h原则  who when where  what why  how
+https://blog.csdn.net/ykp92/article/details/82779672
+http://ju.outofmemory.cn/entry/369205
+清分=记账
+清算=算账
+结算=转账

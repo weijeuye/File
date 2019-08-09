@@ -1,0 +1,231 @@
+[目标]
+参考本地vagrant安装，在北京机房正式安装。
+
+[基本信息]
+<Galera Cluster for MySQL安装教程地址>
+http://galeracluster.com/documentation-webpages/gettingstarted.html
+<ezhttp工具>
+https://github.com/centos-bz/EZHTTP
+<服务器操作系统>
+CentOS 6.6
+<mysql cluster IP>
+my1 ：192.168.1.10
+my2 ：192.168.1.11
+my3 ：192.168.1.12     (root/etoc@password)
+<haproxy cluser>
+ha1+keep1 : 192.168.1.51
+ha2+keep2 ：192.168.1.52
+
+
+
+[overall process]
+1. 系统准备；
+    进行必要升级
+    安装ezhttp进行时区设置(另外可能可以借助其优化mysql基础配置)
+2. mysql cluster单节点安装准备工作
+    关闭SELinux;
+    配置iptables;
+    关闭AppArmor;
+    移除所有可能已有的mysql相关包-重要！！！；
+3. 安装单节点
+    增加yum安装源；
+    通过yum安装；
+4. 依次配置节点my1, my2, my3
+    设置log输出目录
+    更改默认密码
+    修改默认charset
+    设置同步用的msyql账户
+5. 启动集群与测试；
+    启动集群
+    测试
+
+[detailed steps]
+<本地>
+#1. 系统准备
+#进行必要升级
+yum update -y
+#查看版本
+cat /etc/redhat-release
+=====>
+CentOS release 6.6 (Final)
+=====>
+#安装ezhttp进行时区设置
+#通过git来安装ezhttp
+yum install -y git
+cd /opt
+git clone https://github.com/centos-bz/EZHTTP.git
+cd EZHTTP
+chmod +x start.sh
+./start.sh
+=====>
+2 ---> 8(Y) ---> 5 ---> 9 ---> 1 ----> 1 ---> y
+=====>
+#查看,是CST时间并和正常时间一致就对了
+date
+
+#2. mysql cluster单节点安装准备工作
+#如果SELinux启用，需要关掉 - centos没有启用，此处不需要
+#semanage permissive -a mysqld_t
+
+#iptables配置 - 不一定需要，配置了应该也不会出错
+iptables --append INPUT --protocol tcp --source 192.168.1.10 --jump ACCEPT
+iptables --append INPUT --protocol tcp --source 192.168.1.11 --jump ACCEPT
+iptables --append INPUT --protocol tcp --source 192.168.1.12 --jump ACCEPT
+iptables --append INPUT --protocol tcp --source 192.168.1.50 --jump ACCEPT
+iptables --append INPUT --protocol tcp --source 192.168.1.51 --jump ACCEPT
+iptables --append INPUT --protocol tcp --source 192.168.1.52 --jump ACCEPT
+service iptables save
+
+#Disabling AppArmor - 此处应该不要，centos 6.6默认应该没使用AppArmor
+#sudo ln -s /etc/apparmor.d/usr /etc/apparmor.d/disable/.sbin.mysqld
+#sudo service apparmor restart
+
+#移除所有可能已有的mysql相关包-重要！！！；
+rpm --nodeps --allmatches -e mysql-libs mysql-server mysql-test mysql-bench mysql-client
+#这也是生产环境多出来的冲突的包
+rpm --nodeps --allmatches -e mysql-server-5.1.73-3.el6_5.x86_64
+rpm --nodeps --allmatches -e mysql-5.1.73-3.el6_5.x86_64
+rpm --nodeps --allmatches -e mysql-wsrep-devel
+rpm --nodeps --allmatches -e MySQL-client-5.6.21-1.el6.x86_64
+
+
+
+#安装mysql-client包 - 奇怪：本地安装的时候不需要，生产服务器需要！！！
+cd /opt/etoc-softs
+rpm -i MySQL-client-5.6.21-1.el6.x86_64.rpm
+rpm -i MySQL-shared-compat-5.6.21-1.el6.x86_64.rpm
+
+
+#3. 安装单节点
+#增加yum安装源
+#在/etc/yum.repos.d/下增加.repo文件
+cd /etc/yum.repos.d/
+nano codership.repo
+=====>
+[galera]
+name = Galera
+baseurl = http://releases.galeracluster.com/centos/6/x86_64
+gpgkey = http://releases.galeracluster.com/GPG-KEY-galeracluster.com
+gpgcheck = 1
+=====>
+yum update -y
+
+#通过yum安装galera-3和mysql-wsrep-5.6
+yum install -y galera-3 mysql-wsrep-5.6
+#由于连接原因，可能要多安装几次, 可能还需要通过rpm --nodeps --allmatches -e卸载一些冲突包
+
+#查看mysql service是否已经存在
+service mysql
+=====>
+Usage: mysql  {start|stop|restart|reload|force-reload|status}  [ MySQL server options ]
+=====>
+
+#4. 依次配置单节点
+mkdir /opt/mysql-log
+#实际mysql的配置文件位置/usr/my.cnf
+#修改/usr/my.cnf控制log输出位置
+=====>
+# LOGGING #
+log-error                      = /opt/mysql-log/mysql-error.log
+log-queries-not-using-indexes  = 1
+slow-query-log                 = 1
+slow-query-log-file            = /opt/mysql-log/mysql-slow.log
+
+#加配置关闭警告
+explicit_defaults_for_timestamp=true
+=====>
+#修改mysql编码
+nano /usr/my.cnf
+===>
+#找到[client] 添加:
+default-character-set=utf8 //默认字符集为utf8
+
+#找到[mysqld] 添加:
+#默认字符集为utf8
+character-set-server = utf8
+===>
+
+#修改默认密码
+service mysql start
+#su 成root 查看mysql初始密码 - (my1-x0WD_WlAK7xQrmUk) (my2-XuHQcB3v0cdsnlHO) (my3-aS_YAJBmp6nVTrWh) 
+nano /root/.mysql_secret
+#修改mysql root密码
+mysql -u root -p
+=====>
+#my1
+x0WD_WlAK7xQrmUk
+#my2
+XuHQcB3v0cdsnlHO
+#my3
+aS_YAJBmp6nVTrWh
+=====>
+mysql> SET PASSWORD = PASSWORD('1234');
+mysql> SET PASSWORD FOR 'root'@'localhost' = PASSWORD('1234');
+mysql> GRANT ALL PRIVILEGES ON *.* TO root@"%" IDENTIFIED BY "1234";
+mysql> flush privileges;
+mysql> show grants for root;
+mysql> exit
+
+#用新密码登录，并查看编码
+mysql -u root -p
+=====>
+1234
+=====>
+show variables like 'character%';
+
+#设置同步用的msyql账户
+mysql -u root -p
+=====>
+1234
+=====>
+SET wsrep_on=OFF;
+DELETE FROM mysql.user WHERE user='';
+GRANT ALL ON *.* TO 'wsrep-user'@'%' IDENTIFIED BY 'etoc1234';
+
+#集群同步配置
+nano /usr/my.cnf
+=====>
+# Mandatory Settings
+binlog_format=ROW
+default_storage_engine=InnoDB
+innodb_autoinc_lock_mode=2
+
+# Basic wsrep Provider Settings
+wsrep_provider = none
+wsrep_cluster_address=gcomm://192.168.1.10,192.168.1.11,192.168.1.12
+wsrep_cluster_name='test_my_cluster'
+#here is cluster node1, the value is 192.168.1.10
+#if cluster node2, the value is 192.168.1.11,
+#if cluster node3, the value is 192.168.1.12, 
+wsrep_node_address='192.168.1.10'
+#here is cluster node1, the value is test-my1
+#if cluster node2, the value is test-my2,
+#if cluster node3, the value is test-my3, 
+wsrep_node_name='test-my1'
+wsrep_sst_method=rsync
+wsrep_sst_auth = wsrep-user:etoc1234
+=====>
+
+
+5. 启动集群与测试；
+#启动集群
+#依次登录my1, my2, my3, 启动第一个节点的时候使用命令
+#service mysql start --wsrep-new-cluster
+#不是第一个节点的时后，使用命令
+#service mysql start
+#my1上操作
+service mysql start --wsrep-new-cluster
+#my2上操作
+service mysql start
+#my3上操作
+service mysql start
+iptables -I INPUT -p tcp --dport=3306 -j ACCEPT
+iptables -I INPUT -p tcp --dport=4567 -j ACCEPT
+iptables -I INPUT -p tcp --dport=4444 -j ACCEPT
+#测试
+#通过mysql的客户端，分别连接三个数据库，进行增删改查的操作，看是否可以同步
+#跳转机上连接配置
+host: 192.168.1.10(my1) , 192.168.1.11(my2) , 192.168.1.12(my3)
+port: 3306
+user: root
+pwd : 1234

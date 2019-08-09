@@ -1,0 +1,21 @@
+1.部署环境（jekins）
+2.代码库
+3.资料库
+4.开发流程
+5.文件系统
+6.手机验证码
+
+http://docs.xxpay.org/ xpay聚合支付
+https://github.com/fanqinghui/wish-pay  
+https://github.com/milanyangbo/icanpay
+https://github.com/iyangyuan/pay-spring-boot
+https://github.com/tiankong0310/springboot-weixin-alipay网页
+https://github.com/warrenczw/JPay-Web简单的
+https://github.com/tuzongxun/tzx-payment  只要wap
+https://github.com/jijilan/SpringBootDemo.git  简单学习
+https://github.com/Anyz01/spring-boot-pay  可以借鉴 dubbo rpc
+https://github.com/easy-pay/easy-pay
+https://github.com/jmdhappy/xxpay-master  开源收费商业
+
+阿里应用公钥：
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvI7xVuhgjD6tzVB54q6pAgF9lk53hPxW88bkAjNPMBSXL6Mz4zzaaODFddoVcwzeXRzEnRIzCi/TFu9BsuYeYXhPbtvZdWIoLvWITgyfR+srLhyNrvpDr32Zx1jKdXeiIN2IMtrNxYum+fN7rH8buavAKONj9pNgjPfg20kUsYcqBmJRcYsA7Kw+VgvitxaHTnDfTp9UruixDb87EPpM+BujMLGH416Li1YgnwmTs/lbCylFRZlyxLkhOe0GdcVlM6iHoL3XnWUtgzKeU85DQDWDXJeXFbZSJSTwDmLMeo1ZRbF14NM4tp/ax4jumOROXwF2E0AnCLPY4R+fCa4+EwIDAQAB
